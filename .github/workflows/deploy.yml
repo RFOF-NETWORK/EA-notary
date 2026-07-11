@@ -12,7 +12,6 @@ permissions:
 
 concurrency:
   group: "pages"
-  # Auf FALSE geändert: Das verhindert die blockierten Cancel-API-Befehle aus deinem Fehlerprotokoll!
   cancel-in-progress: false
 
 jobs:
@@ -30,7 +29,7 @@ jobs:
           token: ${{ secrets.WALLET_AUTOMATION }}
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v4
         env:
           ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
 
@@ -46,7 +45,5 @@ jobs:
         uses: actions/deploy-pages@v4
         env:
           ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
-          # Integriert die exakten API-Header aus deinen Dokumenten-Screenshots!
-          GITHUB_TOKEN: ${{ secrets.WALLET_AUTOMATION }}
         with:
           token: ${{ secrets.WALLET_AUTOMATION }}
