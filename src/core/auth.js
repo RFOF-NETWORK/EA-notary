@@ -40,4 +40,3 @@ export class AuthService {
         return { success: true, role: role, address: visibleAddress };
     }
 }
-
