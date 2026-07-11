@@ -6,11 +6,10 @@ on:
       - main
 
 permissions:
-  contents: write # Aus deinem Code integriert: Erlaubt das Schreiben im Repo via Token
-  pages: write    # Erlaubt das Veröffentlichen der Webseite
-  id-token: write # Erlaubt die sichere Authentifizierung
+  contents: write
+  pages: write
+  id-token: write
 
-# Aus dem oberen Code integriert: Verhindert Abstürze, wenn du zweimal schnell hintereinander speicherst
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -19,13 +18,18 @@ jobs:
   deploy:
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }} # Aus dem oberen Code integriert: Zeigt dir den fertigen Link direkt an
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    
+    # HEBELT DIE VERSIONSSPERRE AUS: Zwingt den Runner, die Actions trotzdem auszuführen
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+      
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.WALLET_AUTOMATION }} # Aus deinem Code integriert: Nutzt deinen erstellten Master-Token!
+          token: ${{ secrets.WALLET_AUTOMATION }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -39,4 +43,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          token: ${{ secrets.WALLET_AUTOMATION }} # Aus deinem Code integriert: Zwingt GitHub Pages, deinen Token zu nutzen
+          token: ${{ secrets.WALLET_AUTOMATION }}
