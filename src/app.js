@@ -1,3 +1,4 @@
+// Punkte (.) vor den Pfaden hinzugefügt, damit sie im Unterordner geladen werden
 import { SessionManager } from './core/session.js';
 import { LoginView } from './views/login.js';
 import { DashboardView } from './views/dashboard.js';
@@ -19,13 +20,15 @@ function router() {
 
     const view = routes[activeRoute];
     const appContainer = document.getElementById("app");
-    appContainer.innerHTML = view.render();
-    view.init(navigateTo);
+    
+    if (appContainer && view) {
+        appContainer.innerHTML = view.render();
+        view.init(navigateTo);
+    }
 }
 
 function navigateTo(route) {
     router();
 }
 
-// Initialisiere die App beim Laden der Seite
 window.addEventListener("DOMContentLoaded", router);
