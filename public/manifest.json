@@ -1,0 +1,10 @@
+{
+  "short_name": "CryptoWallet",
+  "name": "Repository-Centric Crypto Wallet Gateway",
+  "icons": [],
+  "start_url": "../index.html",
+  "background_color": "#0f172a",
+  "theme_color": "#1e293b",
+  "display": "standalone",
+  "orientation": "portrait"
+}
