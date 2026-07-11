@@ -21,29 +21,25 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
+      # 1. GitHub Checkout auf die neue Version heben
       - name: Checkout
         uses: actions/checkout@v4
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
         with:
           token: ${{ secrets.WALLET_AUTOMATION }}
 
+      # 2. Setup-Pages auf die neue Version heben
       - name: Setup Pages
-        uses: actions/configure-pages@v4
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+        uses: actions/configure-pages@v5
 
+      # 3. Artefakt-Upload auf die neue Node 24-kompatible Version v4 heben
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
         with:
           path: '.'
 
+      # 4. Das finale Deployment auf die neue Version v5 für Node 24 heben
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
         with:
           token: ${{ secrets.WALLET_AUTOMATION }}
