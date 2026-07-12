@@ -10,40 +10,34 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
-
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          token: ${{ secrets.WALLET_AUTOMATION }}
+          node-version: 20
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+      - name: Install dependencies
+        run: npm install
 
-      - name: Upload Artifact
+      - name: Build project
+        run: npm run build
+
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
         with:
-          path: '.'
+          path: ./dist   # oder ./build – je nach Bundler
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
-        with:
-          token: ${{ secrets.4WALLET_PC }}
