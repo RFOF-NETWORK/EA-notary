@@ -1,31 +1,48 @@
 import { wordlist } from '../vendor/scure-bip39/english.js';
 
 export class HDWalletEngine {
-    // Generiert deterministisch eine valide 12-Wort-Phrase basierend auf dem Passwort-Hash
+
     static generateDeterministicMnemonic(seedHex) {
-        // BIP39 benötigt exakt 16 Bytes (128 Bit) Entropie für 12 Wörter
+        // 128 Bit Entropie aus seedHex
         const entropy = new Uint8Array(16);
         for (let i = 0; i < 16; i++) {
-            entropy[i] = parseInt(seedHex.substr(i * 2, 2), 16) ^ 0xAA; // Deterministische Maske
+            entropy[i] = parseInt(seedHex.substr(i * 2, 2), 16);
         }
+
+        // Checksum erzeugen (SHA-256)
+        const checksum = crypto.subtle.digest("SHA-256", entropy);
         
-        // Simulierter BIP39 Mapping-Algorithmus basierend auf der geladenen Wortliste
-        const words = [];
-        for (let i = 0; i < 12; i++) {
-            const index = ((entropy[i % 16] << 4) + (entropy[(i + 1) % 16] & 0x0F)) % 2048;
-            words.push(wordlist[index]);
-        }
-        return words.join(' ');
+        return checksum.then(buffer => {
+            const hash = new Uint8Array(buffer);
+            const bits = [...entropy, hash[0]]; // 128 + 8 = 136 Bits
+
+            const words = [];
+            let bitIndex = 0;
+
+            for (let i = 0; i < 12; i++) {
+                let idx = 0;
+                for (let j = 0; j < 11; j++) {
+                    const byteIndex = Math.floor((bitIndex + j) / 8);
+                    const bitOffset = 7 - ((bitIndex + j) % 8);
+                    idx = (idx << 1) | ((bits[byteIndex] >> bitOffset) & 1);
+                }
+                words.push(wordlist[idx]);
+                bitIndex += 11;
+            }
+
+            return words.join(" ");
+        });
     }
 
-    // Generiert aus einer Phrase eine sichtbare Wallet-Adresse
     static deriveAddressFromMnemonic(mnemonic) {
-        // Clientseitiges deterministisches Hashing zur Adressgenerierung (Simuliert Bitcoin bc1q)
-        let hash = 0;
-        for (let i = 0; i < mnemonic.length; i++) {
-            hash = (hash << 5) - hash + mnemonic.charCodeAt(i);
-            hash |= 0;
-        }
-        return "bc1q" + Math.abs(hash).toString(16).padStart(8, '0') + "walletaddress" + Math.abs(hash * 3).toString(16);
+        // Stabiler Hash (SHA-256)
+        const encoder = new TextEncoder();
+        const data = encoder.encode(mnemonic.trim().toLowerCase());
+
+        return crypto.subtle.digest("SHA-256", data).then(buffer => {
+            const hash = new Uint8Array(buffer);
+            const hex = [...hash].map(b => b.toString(16).padStart(2, '0')).join('');
+            return "bc1q" + hex.slice(0, 8) + "walletaddress" + hex.slice(8);
+        });
     }
 }
