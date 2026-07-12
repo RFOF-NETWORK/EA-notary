@@ -1,7 +1,8 @@
 // src/core/hd-wallet.js
 
 // Annahme: Du hast diese Libraries als ES-Module unter vendor eingebunden.
-// Pfade ggf. an deine Struktur anpassen.
+// Pfade ggf. an deine Struktur anpassen
+
 import { wordlist, generateMnemonic, validateMnemonic as bip39Validate, mnemonicToSeedSync } from '../vendor/scure-bip39/index.js';
 import { HDKey } from '../vendor/scure-bip32/index.js';
 import { getPublicKey } from '../vendor/noble-secp256k1/index.js';
