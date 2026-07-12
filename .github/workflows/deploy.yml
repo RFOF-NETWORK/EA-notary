@@ -28,4 +28,4 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
         with:
-          token: ${{ secrets.WALLET_PC }}
+          token: ${{ secrets.4WALLET_PC }}
