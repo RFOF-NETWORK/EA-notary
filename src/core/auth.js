@@ -5,38 +5,56 @@ import { SessionManager } from './session.js';
 
 export class AuthService {
     static async processLoginOrRegister(username, password, customMnemonic = null) {
-        const masterKey = await CryptoEngine.deriveMasterKey(username, password);
-        const seedHex = await CryptoEngine.keyToHex(masterKey);
-        
-        // 1. Verwende existierende BIP39 Wallet oder generiere sie automatisch deterministisch
-        let mnemonic = customMnemonic;
-        if (!mnemonic) {
-            mnemonic = HDWalletEngine.generateDeterministicMnemonic(seedHex);
+        try {
+            // 1. Master-Key ableiten
+            const masterKey = await CryptoEngine.deriveMasterKey(username, password);
+            const seedHex = await CryptoEngine.keyToHex(masterKey);
+
+            // 2. Mnemonic validieren oder generieren
+            let mnemonic = customMnemonic?.trim();
+            if (mnemonic) {
+                if (!HDWalletEngine.validateMnemonic(mnemonic)) {
+                    return { success: false, error: "Ungültige BIP39-Wortliste." };
+                }
+            } else {
+                mnemonic = HDWalletEngine.generateDeterministicMnemonic(seedHex);
+            }
+
+            // 3. Adresse ableiten
+            const visibleAddress = HDWalletEngine.deriveAddressFromMnemonic(mnemonic);
+
+            // 4. Admin-Erkennung
+            const isAdmin = (visibleAddress === SYSTEM_CONFIG.ADMIN_WALLET_ADDRESS);
+            const role = isAdmin ? "admin" : "user";
+
+            // 5. Cold-Phrase verschlüsseln
+            const encryptedPhrase = await CryptoEngine.encryptData(mnemonic, masterKey);
+
+            const record = {
+                username: username.toLowerCase().trim(),
+                visibleAddress,
+                ciphertext: encryptedPhrase.ciphertext,
+                iv: encryptedPhrase.iv
+            };
+
+            // 6. LocalStorage speichern (mit Fehlerfang)
+            try {
+                localStorage.setItem(`user_${record.username}`, JSON.stringify(record));
+            } catch (e) {
+                return { success: false, error: "LocalStorage blockiert." };
+            }
+
+            // 7. Session starten
+            try {
+                SessionManager.startSession(username, role, visibleAddress, mnemonic);
+            } catch (e) {
+                return { success: false, error: "Session konnte nicht gestartet werden." };
+            }
+
+            return { success: true, role, address: visibleAddress };
+
+        } catch (e) {
+            return { success: false, error: "Interner Fehler: " + e.message };
         }
-
-        // 2. Leite die sichtbare Adresse ab
-        const visibleAddress = HDWalletEngine.deriveAddressFromMnemonic(mnemonic);
-
-        // 3. Der Dreh: Überprüfung auf Admin-Status
-        const isAdmin = (visibleAddress === SYSTEM_CONFIG.ADMIN_WALLET_ADDRESS);
-        const role = isAdmin ? "admin" : "extensioned_user";
-
-        // 4. Verschlüssele die unsichtbare Phrase ("Cold") für den lokalen Speicher
-        const encryptedPhrase = await CryptoEngine.encryptData(mnemonic, masterKey);
-        
-        // Speicher-Objekt für LocalStorage vorbereiten
-        const record = {
-            username: username.toLowerCase().trim(),
-            visibleAddress: visibleAddress,
-            ciphertext: encryptedPhrase.ciphertext,
-            iv: encryptedPhrase.iv
-        };
-
-        localStorage.setItem(`user_${record.username}`, JSON.stringify(record));
-        
-        // In sicherer temporärer Session speichern
-        SessionManager.startSession(username, role, visibleAddress, mnemonic);
-
-        return { success: true, role: role, address: visibleAddress };
     }
 }
