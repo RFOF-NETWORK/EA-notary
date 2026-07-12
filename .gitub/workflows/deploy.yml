@@ -16,20 +16,28 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Build
+      - name: Build & Prepare Pipeline
         run: |
+          # 1. Erstelle das saubere Verzeichnis für die Projektion
           mkdir -p dist
-          # EXKLUSIVE Kopie: Nur das, was wirklich in die Vitrine muss
+          
+          # 2. Kopiere NUR die essenziellen Funktionsbausteine
+          # Das Nervenzentrum (src) und die Identitätshülle (public)
           cp -r src/ dist/src/
+          cp -r public/ dist/public/
+          
+          # 3. Kopiere den Nullpunkt (Einstiegspunkt)
           cp index.html dist/index.html
-          # public Ordner nur kopieren, falls er existiert
-          if [ -d "public" ]; then cp -r public/ dist/public/; fi
+          
+          # Hinweis: package.json, README.md und .github/ werden hier 
+          # bewusst NICHT in den dist-Ordner übernommen.
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          # Die Garantie für die Trennung: 
-          # Löscht den alten Branch-Inhalt komplett, bevor neu geschrieben wird.
+          # Die architektonische Garantie: 
+          # Jeder Durchlauf leert den gh-pages Branch komplett, 
+          # bevor nur die frischen Dateien aus 'dist' projiziert werden.
           force_orphan: true
