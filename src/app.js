@@ -14,6 +14,7 @@ let currentRoute = "login";
 function router() {
     const session = SessionManager.getSession();
 
+    // Automatische Rollen-Erkennung
     if (session) {
         currentRoute = (session.role === "admin") ? "admin" : "dashboard";
     }
@@ -21,15 +22,18 @@ function router() {
     const view = routes[currentRoute];
     const appContainer = document.getElementById("app");
 
-    if (!appContainer || !view) return;
+    if (!appContainer || !view) {
+        console.error("Router-Fehler: Container oder View fehlt.");
+        return;
+    }
 
-    // Render
+    // Rendern
     appContainer.innerHTML = view.render();
 
-    // Init AFTER DOM exists
-    setTimeout(() => {
+    // Init NACH dem Rendern
+    requestAnimationFrame(() => {
         view.init(navigateTo);
-    }, 0);
+    });
 }
 
 function navigateTo(route) {
@@ -37,6 +41,7 @@ function navigateTo(route) {
     router();
 }
 
+// GitHub Pages: Router erst starten, wenn DOM sicher geladen ist
 window.addEventListener("DOMContentLoaded", () => {
     router();
 });
