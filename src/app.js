@@ -1,4 +1,3 @@
-// Punkte (.) vor den Pfaden hinzugefügt, damit sie im Unterordner geladen werden
 import { SessionManager } from './core/session.js';
 import { LoginView } from './views/login.js';
 import { DashboardView } from './views/dashboard.js';
@@ -10,25 +9,34 @@ const routes = {
     admin: AdminPanelView
 };
 
+let currentRoute = "login";
+
 function router() {
     const session = SessionManager.getSession();
-    let activeRoute = "login";
 
     if (session) {
-        activeRoute = (session.role === "admin") ? "admin" : "dashboard";
+        currentRoute = (session.role === "admin") ? "admin" : "dashboard";
     }
 
-    const view = routes[activeRoute];
+    const view = routes[currentRoute];
     const appContainer = document.getElementById("app");
-    
-    if (appContainer && view) {
-        appContainer.innerHTML = view.render();
+
+    if (!appContainer || !view) return;
+
+    // Render
+    appContainer.innerHTML = view.render();
+
+    // Init AFTER DOM exists
+    setTimeout(() => {
         view.init(navigateTo);
-    }
+    }, 0);
 }
 
 function navigateTo(route) {
+    currentRoute = route;
     router();
 }
 
-window.addEventListener("DOMContentLoaded", router);
+window.addEventListener("DOMContentLoaded", () => {
+    router();
+});
