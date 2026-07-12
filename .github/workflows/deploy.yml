@@ -1,0 +1,40 @@
+name: CI-CD-Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Build & Debug Structure
+        run: |
+          # 1. Bereinigen
+          rm -rf dist
+          mkdir -p dist
+          
+          # 2. Kopieren
+          cp -r src/ dist/src/
+          cp -r public/ dist/public/
+          cp index.html dist/index.html
+          
+          # 3. DEBUG: Zeige uns die Struktur im Log, damit wir sehen, was passiert
+          echo "--- Verzeichnisstruktur in dist: ---"
+          ls -R dist
+          echo "------------------------------------"
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          force_orphan: true
