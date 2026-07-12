@@ -1,0 +1,39 @@
+name: Deploy-Automation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build
+        run: |
+          mkdir -p dist
+          cp -r src dist/src
+          cp index.html dist/index.html
+          cp -r public dist/public 2>/dev/null || true
+          # HASH-Logik bleibt erhalten
+          HASH=$(date +%s)
+          sed -i "s|src/app.js|src/app.js?v=$HASH|g" dist/index.html
+          sed -i "s|<head>|<head><base href='/EA-notary/'>|g" dist/index.html
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
