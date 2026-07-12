@@ -1,4 +1,4 @@
-import { encrypt, decrypt } from './crypto.js'; // Pfad prüfen, falls es im selben Ordner liegt
+import { encrypt, decrypt } from 'src/crypto.js'; // Pfad prüfen, falls es im selben Ordner liegt
 
 export class SessionManager {
   static startSession(username, role, address, cleartextMnemonic) {
