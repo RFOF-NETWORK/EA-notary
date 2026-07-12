@@ -10,36 +10,26 @@ permissions:
   contents: write
 
 jobs:
-  # PHASE 1: INTEGRATION & VALIDIERUNG
-  validate-and-build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-
-      - name: Build & Prepare Pipeline
+      - name: Build
         run: |
           mkdir -p dist
-          # Nur das Nötigste für die Produktion kopieren
-          cp -r src dist/src
+          # EXKLUSIVE Kopie: Nur das, was wirklich in die Vitrine muss
+          cp -r src/ dist/src/
           cp index.html dist/index.html
-          cp -r public dist/public 2>/dev/null || true
-          
-          # HASH-Generierung für Cache-Busting (Performance-Optimierung)
-          HASH=$(date +%s)
-          sed -i "s|src/app.js|src/app.js?v=$HASH|g" dist/index.html
-          sed -i "s|<head>|<head><base href='./'>|g" dist/index.html
+          # public Ordner nur kopieren, falls er existiert
+          if [ -d "public" ]; then cp -r public/ dist/public/; fi
 
-      # PHASE 2: DEPLOYMENT (DIE PROJEKTION)
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          # Diese Einstellung garantiert die Trennung der Branches
-          keep_files: false
+          # Die Garantie für die Trennung: 
+          # Löscht den alten Branch-Inhalt komplett, bevor neu geschrieben wird.
+          force_orphan: true
