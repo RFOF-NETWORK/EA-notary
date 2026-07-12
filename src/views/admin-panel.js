@@ -3,6 +3,17 @@ import { SessionManager } from '../core/session.js';
 export const AdminPanelView = {
     render: () => {
         const session = SessionManager.getSession();
+
+        // Schutz: Wenn keine Session existiert → leere View
+        if (!session || session.role !== "admin") {
+            return `
+                <div class="crypto-card admin-card">
+                    <h2>Keine Admin-Sitzung aktiv</h2>
+                    <p>Bitte erneut anmelden.</p>
+                </div>
+            `;
+        }
+
         return `
             <div class="crypto-card admin-card">
                 <span class="badge admin-badge">🛡️ SYSTEM ADMINISTRATOR</span>
@@ -23,7 +34,13 @@ export const AdminPanelView = {
             </div>
         `;
     },
+
     init: () => {
-        document.getElementById("btnLogout").addEventListener("click", () => SessionManager.endSession());
+        const btn = document.getElementById("btnLogout");
+
+        // Schutz: Button existiert nur bei aktiver Admin-Sitzung
+        if (btn) {
+            btn.addEventListener("click", () => SessionManager.endSession());
+        }
     }
 };
