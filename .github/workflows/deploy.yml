@@ -20,6 +20,7 @@ jobs:
 
       - name: Build with Cache-Bust
         run: |
+          set -e
           mkdir -p dist
           cp -r src dist/src
           cp index.html dist/index.html
