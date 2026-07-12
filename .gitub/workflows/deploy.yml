@@ -1,4 +1,4 @@
-name: Deploy-Automation
+name: CI-CD-Pipeline
 
 on:
   push:
@@ -10,7 +10,8 @@ permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  # PHASE 1: INTEGRATION & VALIDIERUNG
+  validate-and-build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -21,18 +22,24 @@ jobs:
         with:
           node-version: 24
 
-      - name: Build
+      - name: Build & Prepare Pipeline
         run: |
           mkdir -p dist
+          # Nur das Nötigste für die Produktion kopieren
           cp -r src dist/src
           cp index.html dist/index.html
           cp -r public dist/public 2>/dev/null || true
+          
+          # HASH-Generierung für Cache-Busting (Performance-Optimierung)
           HASH=$(date +%s)
           sed -i "s|src/app.js|src/app.js?v=$HASH|g" dist/index.html
           sed -i "s|<head>|<head><base href='./'>|g" dist/index.html
 
-      - name: Deploy
+      # PHASE 2: DEPLOYMENT (DIE PROJEKTION)
+      - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          # Diese Einstellung garantiert die Trennung der Branches
+          keep_files: false
