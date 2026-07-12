@@ -23,10 +23,9 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .   # oder ./public, wenn du dort index.html hast
+          path: ./public  # oder ./, falls index.html im Root liegt
 
       - name: Deploy to GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
         with:
-          token: ${{ secrets.4WALLET_PC }}
+          token: ${{ secrets.GITHUB_TOKEN }}
