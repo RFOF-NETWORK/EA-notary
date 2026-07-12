@@ -1,4 +1,4 @@
-import { AuthService } from '../core/auth.js';
+import { AuthService } from 'src/core/auth.js';
 
 export const LoginView = {
     render: () => `
