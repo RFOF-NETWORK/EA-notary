@@ -28,9 +28,10 @@ jobs:
 
           HASH=$(date +%s)
           sed -i "s|src/app.js|src/app.js?v=$HASH|g" dist/index.html
+          sed -i "s|<head>|<head><base href='/EA-notary/'>|g" dist/index.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
-          github_token: ${{ secrets.WALLET_PC }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
