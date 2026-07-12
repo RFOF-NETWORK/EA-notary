@@ -1,4 +1,4 @@
-import { SessionManager } from '../core/session.js';
+import { SessionManager } from 'src/core/session.js';
 
 export const AdminPanelView = {
     render: () => {
