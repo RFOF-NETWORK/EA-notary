@@ -3,6 +3,16 @@ import { SessionManager } from '../core/session.js';
 export const DashboardView = {
     render: () => {
         const session = SessionManager.getSession();
+
+        if (!session || session.role !== "user") {
+            return `
+                <div class="crypto-card">
+                    <h2>Keine gültige Benutzersitzung aktiv</h2>
+                    <p>Bitte erneut anmelden.</p>
+                </div>
+            `;
+        }
+
         return `
             <div class="crypto-card">
                 <span class="badge user-badge">Extensioned User</span>
@@ -22,7 +32,11 @@ export const DashboardView = {
             </div>
         `;
     },
+
     init: () => {
-        document.getElementById("btnLogout").addEventListener("click", () => SessionManager.endSession());
+        const btn = document.getElementById("btnLogout");
+        if (btn) {
+            btn.addEventListener("click", () => SessionManager.endSession());
+        }
     }
 };
