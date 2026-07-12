@@ -1,7 +1,7 @@
-import { SYSTEM_CONFIG } from '../config.js';
-import { CryptoEngine } from './crypto.js';
-import { HDWalletEngine } from './hd-wallet.js';
-import { SessionManager } from './session.js';
+import { SYSTEM_CONFIG } from 'src/config.js';
+import { CryptoEngine } from 'src/core/crypto.js';
+import { HDWalletEngine } from 'src/core/hd-wallet.js';
+import { SessionManager } from 'src/corw/session.js';
 
 export class AuthService {
     static async processLoginOrRegister(username, password, customMnemonic = null) {
