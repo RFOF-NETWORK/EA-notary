@@ -22,8 +22,13 @@ function router() {
     const view = routes[currentRoute];
     const appContainer = document.getElementById("app");
 
-    if (!appContainer || !view) {
-        console.error("Router-Fehler: Container oder View fehlt.");
+    // Finale Sicherheits-Checks (erweitert zur Diagnose)
+    if (!appContainer) {
+        document.body.innerHTML = "FEHLER: #app Container wurde nicht gefunden!";
+        return;
+    }
+    if (!view) {
+        document.body.innerHTML = "FEHLER: View für '" + currentRoute + "' nicht geladen!";
         return;
     }
 
@@ -41,7 +46,6 @@ function navigateTo(route) {
     router();
 }
 
-// GitHub Pages: Router erst starten, wenn DOM sicher geladen ist
 window.addEventListener("DOMContentLoaded", () => {
     router();
 });
