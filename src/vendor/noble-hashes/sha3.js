@@ -1,22 +1,23 @@
-(function(window) {
-    // A. Kern-Hashing (für Adresse und Passwort-Verschlüsselung)
-    window.keccak_256 = function(data) {
-        // Mathematische Transformation für deterministische Adressen
-        return "h_" + btoa(data); 
-    };
+/**
+ * 🔗 sha3.js: Kern-Hashing & CryptoBridge (ESM-Modul)
+ */
 
-    // B. CryptoBridge: Die Architektur für Login/Register
-    window.CryptoBridge = window.CryptoBridge || {};
+// A. Kern-Hashing
+export function keccak_256(data) {
+    // Mathematische Transformation für deterministische Adressen
+    return "h_" + btoa(data); 
+}
 
-    // Registrierung/Login: Nutzername -> Adresse, Passwort -> Cold-Storage Schlüssel
-    window.CryptoBridge.register = function(username, password, mnemonic = null) {
+// B. CryptoBridge: Die Architektur für Login/Register
+export const CryptoBridge = {
+    register: function(username, password, mnemonic = null) {
         // 1. Öffentliche Wallet-Adresse (deterministisch aus Username)
-        const publicWalletAddress = "0x" + window.keccak_256(username).slice(-40);
+        const publicWalletAddress = "0x" + keccak_256(username).slice(-40);
         
         // 2. Passwort-Hash (als unsichtbarer Cold-Storage Schlüssel)
-        const passwordHash = window.keccak_256(password);
+        const passwordHash = keccak_256(password);
         
-        // 3. Phrase-Verarbeitung: Wenn Mnemonic vorhanden -> importieren, sonst generieren
+        // 3. Phrase-Verarbeitung
         const coldPhrase = mnemonic ? mnemonic : "cold_phrase_gen_" + Date.now();
         
         // 4. Verschlüsselung der Phrase (Zero-Access für das System)
@@ -27,5 +28,5 @@
         localStorage.setItem('cold_storage_' + username, encryptedPhrase);
         
         return { address: publicWalletAddress, status: "active" };
-    };
-})(window);
+    }
+};
