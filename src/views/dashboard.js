@@ -1,9 +1,13 @@
-import { SessionManager } from 'src/core/session.js';
+/**
+ * 📊 DashboardView: Benutzeroberfläche für Extensioned User
+ */
+import { SessionManager } from '../core/session.js';
 
 export const DashboardView = {
     render: () => {
         const session = SessionManager.getSession();
 
+        // Schutz: Rollenbasierte Validierung
         if (!session || session.role !== "user") {
             return `
                 <div class="crypto-card">
@@ -36,7 +40,10 @@ export const DashboardView = {
     init: () => {
         const btn = document.getElementById("btnLogout");
         if (btn) {
-            btn.addEventListener("click", () => SessionManager.endSession());
+            btn.addEventListener("click", () => {
+                SessionManager.endSession();
+                // Hier erfolgt nach dem Logout idealerweise der View-Switch zum Login
+            });
         }
     }
 };
