@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EA-notary</title>
+    <!-- CSS wird geladen -->
+    <link rel="stylesheet" href="src/assets/styles.css">
+</head>
+<body>
+    <!-- 🚨 DIAGNOSEMONITOR (Zeigt Ladefehler direkt auf dem Smartphone-Display an) -->
+    <div id="handy-konsole" style="background: #fff0f0; color: #d90000; padding: 15px; font-family: monospace; font-size: 13px; z-index: 99999; position: relative; border-bottom: 3px solid red; display: none; word-wrap: break-word;">
+        <strong>Centric Global Status (gh-pages):</strong><br>
+    </div>
+
+    <div id="app">System wird geladen...</div>
+
+    <script>
+        // Deine aktualisierte, exakte Dateiliste
+        const scriptQueue = [
+            // 1. VENDOR (Mathematische Basis)
+            "src/vendor/sha3.js", 
+            "src/vendor/index.js",
+            "src/vendor/scure-bip39/english.js",
+            
+            // 2. CONFIG & CORE (Logik & Kryptografie)
+            "src/config.js",
+            "src/core/crypto.js",
+            "src/core/hd-wallet.js",
+            "src/core/session.js",
+            
+            // 3. VIEWS (UI-Ansichten - inklusive admin-panel.js!)
+            "src/views/login.js",
+            "src/views/dashboard.js",
+            "src/views/admin-panel.js", 
+            
+            // 4. APP CONTROL (Initialisierung & Router)
+            "src/app.js"
+        ];
+
+        const consoleDiv = document.getElementById('handy-konsole');
+        
+        // Fängt Code- und Syntaxfehler der Skripte ab
+        window.addEventListener('error', function(e) {
+            consoleDiv.style.display = 'block';
+            consoleDiv.innerHTML += `<div>❌ Code-Fehler: ${e.message} <br><small>in ${e.filename ? e.filename.split('/').pop() : 'Unbekannt'}:${e.lineno}</small></div><hr style="border:0;border-top:1px solid #ffcccc;">`;
+        });
+
+        function loadNextScript(index) {
+            if (index >= scriptQueue.length) {
+                console.log("🚀 Alle Skripte erfolgreich geladen.");
+                return;
+            }
+
+            const scriptPath = scriptQueue[index];
+            const script = document.createElement('script');
+            script.type = "module"; // Wichtig für Krypto-Module ohne Compiler
+            
+            // Cache-Buster: Zwingt GitHub Pages, immer die neueste Datei auszuliefern
+            script.src = scriptPath + "?v=" + Date.now();
+
+            script.onload = () => loadNextScript(index + 1);
+
+            script.onerror = () => {
+                consoleDiv.style.display = 'block';
+                consoleDiv.innerHTML += `<div>❌ <strong>Ladefehler (404):</strong> Datei fehlt im globalen gh-pages Spiegel:<br><code style="background:#fff;padding:2px 5px;">${scriptPath}</code><br><small>Prüfe, ob du den lokalen Push von 'main' am Handy sauber ausgeführt hast.</small></div><hr style="border:0;border-top:1px solid #ffcccc;">`;
+            };
+
+            document.body.appendChild(script);
+        }
+
+        // Kette starten
+        loadNextScript(0);
+    </script>
+</body>
+</html>

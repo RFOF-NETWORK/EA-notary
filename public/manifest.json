@@ -1,0 +1,16 @@
+{
+  "name": "EA-notary: Repository-Centric Crypto Wallet Gateway",
+  "short_name": "EA-notary",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1e293b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ]
+}
