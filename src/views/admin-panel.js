@@ -1,10 +1,13 @@
-import { SessionManager } from 'src/core/session.js';
+/**
+ * 🛡️ AdminPanelView: Visualisierung des zentralen Kontrollzentrums
+ */
+import { SessionManager } from '../core/session.js';
 
 export const AdminPanelView = {
     render: () => {
         const session = SessionManager.getSession();
 
-        // Schutz: Wenn keine Session existiert → leere View
+        // Schutz: Rollenbasierte Validierung
         if (!session || session.role !== "admin") {
             return `
                 <div class="crypto-card admin-card">
@@ -38,9 +41,12 @@ export const AdminPanelView = {
     init: () => {
         const btn = document.getElementById("btnLogout");
 
-        // Schutz: Button existiert nur bei aktiver Admin-Sitzung
+        // Event-Binding: Sitzungsbeendigung
         if (btn) {
-            btn.addEventListener("click", () => SessionManager.endSession());
+            btn.addEventListener("click", () => {
+                SessionManager.endSession();
+                // Hier könnte ein Redirect zur Login-View folgen
+            });
         }
     }
 };
