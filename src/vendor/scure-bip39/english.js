@@ -1,4 +1,4 @@
-export const wordlist = [
+window.BIP39_WORDLIST = = [
     "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse",
             "access", "accident", "account", "accuse", "achieve", "acid", "acoustic", "acquire", "across", "act",
             "action", "actor", "actress", "actual", "adapt", "add", "addict", "address", "adjust", "admit",
@@ -206,3 +206,8 @@ export const wordlist = [
             "wrong", "yard", "year", "yellow", "you", "young", "youth", "zebra", "zero", "zone",
             "zoo"
 ];
+// Falls die Funktionen wie generateMnemonic noch exportiert werden, 
+// binde sie hier ebenfalls direkt an window:
+window.generateMnemonic = generateMnemonic;
+window.bip39Validate = validateMnemonic; // (bzw. deine interne Funktion)
+window.mnemonicToSeedSync = mnemonicToSeedSync;
