@@ -16,25 +16,27 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Build & Deploy
+      - name: Build & Clean Deployment
         run: |
-          # 1. Bereinigen und Vorbereiten
+          # Alles Alte weg
           rm -rf dist
           mkdir -p dist
           
-          # 2. Kopieren aller notwendigen Ressourcen
+          # Kopiere NUR das, was wir brauchen
           cp -r src/ dist/src/
           cp -r public/ dist/public/
           cp index.html dist/index.html
           
-          # 3. Validierung der Struktur
-          echo "Prüfung der Struktur:"
-          ls -F dist/
-          ls -F dist/src/
+          # HINZUGEFÜGT: Erstelle .nojekyll explizit, um Jekyll-Konflikte zu stoppen
+          touch dist/.nojekyll
           
+          echo "Deployment-Struktur fertig."
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          # force_orphan: true sorgt dafür, dass die gh-pages Branche 
+          # bei jedem Deploy komplett neu erstellt wird.
           force_orphan: true
