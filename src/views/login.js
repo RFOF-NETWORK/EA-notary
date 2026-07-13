@@ -1,4 +1,7 @@
-import { AuthService } from 'src/core/auth.js';
+/**
+ * 🔑 LoginView: Gateway zur Benutzerauthentifizierung
+ */
+import { AuthService } from '../core/auth.js';
 
 export const LoginView = {
     render: () => `
@@ -27,10 +30,12 @@ export const LoginView = {
 
         if (!btnLogin || !toggleImport) return;
 
+        // Akkordeon-Logik
         toggleImport.addEventListener("click", () => {
             document.getElementById("bip39-import").classList.toggle("hidden");
         });
 
+        // Authentifizierungs-Handler
         btnLogin.addEventListener("click", async () => {
             const user = document.getElementById("username").value.trim();
             const pass = document.getElementById("password").value.trim();
@@ -58,6 +63,7 @@ export const LoginView = {
                     return;
                 }
 
+                // Routing basierend auf der authentifizierten Rolle
                 navigateTo(result.role === "admin" ? "admin" : "dashboard");
 
             } catch (e) {
