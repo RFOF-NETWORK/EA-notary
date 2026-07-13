@@ -4,57 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EA-notary</title>
-    <link rel="stylesheet" href="src/assets/styles.css">
+    <script>
+        const cacheBuster = Date.now();
+        const css = document.createElement('link');
+        css.rel = 'stylesheet';
+        css.href = `src/assets/styles.css?v=${cacheBuster}`;
+        document.head.appendChild(css);
+    </script>
 </head>
 <body>
-    <!-- 🚨 HANDY-FEHLERMONITOR (Zeigt JS-Fehler sofort oben auf dem Smartphone an) -->
+    <!-- 🚨 HANDY-FEHLERMONITOR -->
     <div id="handy-konsole" style="background: #fff0f0; color: #d90000; padding: 15px; font-family: monospace; font-size: 13px; z-index: 99999; position: relative; border-bottom: 3px solid red; display: none; word-wrap: break-word;">
-        <strong>JavaScript Fehler erkannt:</strong><br>
+        <strong>System-Status / Fehler:</strong><br>
     </div>
+
+    <div id="app">System wird initialisiert...</div>
+
     <script>
+        // Bereinigte Liste – exakt nach deiner echten Ordnerstruktur:
+        const scriptQueue = [
+            // 1. VENDOR (Mathematik & Bibliotheken)
+            "src/vendor/noble-hashes/sha3.js",
+            "src/vendor/noble-secp256k1/index.js",
+            "src/vendor/scure-bip39/english.js",
+            
+            // 2. CONFIG & CORE (Logik & Verschlüsselung)
+            "src/config.js",
+            "src/core/crypto.js",
+            "src/core/hd-wallet.js",
+            "src/core/session.js",
+            // Hinweis: auth.js war in deiner Struktur nicht gelistet, falls es fehlt, wirft der Monitor einen Fehler.
+            
+            // 3. VIEWS (UI-Ansichten)
+            "src/views/login.js",
+            "src/views/dashboard.js",
+            // ❌ wallet-import.js wurde hier komplett entfernt, da sie nicht existiert!
+            
+            // 4. APP (Router & Hauptsteuerung)
+            "src/app.js"
+        ];
+
+        const consoleDiv = document.getElementById('handy-konsole');
+        
         window.addEventListener('error', function(e) {
-            const consoleDiv = document.getElementById('handy-konsole');
             consoleDiv.style.display = 'block';
-            consoleDiv.innerHTML += '<div>❌ ' + e.message + ' <br><small>in ' + (e.filename ? e.filename.split('/').pop() : 'Unbekannt') + ':' + e.lineno + '</small></div><hr style="border:0;border-top:1px solid #ffcccc;">';
+            consoleDiv.innerHTML += `<div>❌ Fehler: ${e.message} <br><small>in ${e.filename ? e.filename.split('/').pop() : 'Unbekannt'}:${e.lineno}</small></div><hr style="border:0;border-top:1px solid #ffcccc;">`;
         });
-    </script>
 
-    <div id="app">System wird geladen...</div>
+        function loadNextScript(index) {
+            if (index >= scriptQueue.length) {
+                console.log("🚀 Alle vorhandenen Skripte erfolgreich geladen!");
+                return;
+            }
 
-    <!-- 1. VENDOR-EBENE (Als Module geladen, da noble-Bibliotheken ES-Exporte nutzen) -->
-    <script type="module" src="src/vendor/noble-hashes/sha3.js"></script>
-    <script type="module" src="src/vendor/noble-secp256k1/index.js"></script>
-    <script type="module" src="src/vendor/scure-bip39/english.js"></script>
+            const scriptPath = scriptQueue[index];
+            const script = document.createElement('script');
+            script.type = "module"; 
+            
+            // Verhindert GitHub- & Browser-Caching komplett
+            const freshTimestamp = Date.now();
+            script.src = `${scriptPath}?v=${freshTimestamp}`;
 
-    <!-- 2. CORE-EBENE: System-Logik & Config -->
-    <script type="module" src="src/config.js"></script>
-    <script type="module" src="src/core/crypto.js"></script>
-    <script type="module" src="src/core/hd-wallet.js"></script>
-    <script type="module" src="src/core/session.js"></script>
-    <script type="module" src="src/core/auth.js"></script>
+            script.onload = () => {
+                loadNextScript(index + 1);
+            };
 
-    <!-- 3. VIEW-EBENE: UI-Komponenten -->
-    <script type="module" src="src/views/login.js"></script>
-    <script type="module" src="src/views/dashboard.js"></script>
-    <script type="module" src="src/views/wallet-import.js"></script>
+            script.onerror = () => {
+                consoleDiv.style.display = 'block';
+                consoleDiv.innerHTML += `<div>❌ <strong>Ladefehler (404):</strong> Datei nicht gefunden:<br><code style="background:#fff;padding:2px 5px;">${scriptPath}</code><br><small>Falls du diese Datei auch nicht hast, lösche sie einfach am Handy oben aus der "scriptQueue"-Liste im HTML.</small></div><hr style="border:0;border-top:1px solid #ffcccc;">`;
+            };
 
-    <!-- 4. APP-EBENE: Controller & Router -->
-    <script type="module" src="src/app.js"></script>
+            document.body.appendChild(script);
+        }
 
-    <!-- 5. SYSTEM-DIAGNOSE -->
-    <script type="module">
-        window.addEventListener("DOMContentLoaded", () => {
-            console.log("System-Check: Prüfe Initialisierung...");
-            setTimeout(() => {
-                if (window.CryptoEngine || window.AuthService || document.getElementById('app').innerHTML !== 'System wird geladen...') {
-                    console.log("System-Check: ERFOLG");
-                } else {
-                    const consoleDiv = document.getElementById('handy-konsole');
-                    consoleDiv.style.display = 'block';
-                    consoleDiv.innerHTML += '<div>⚠️ Warnung: Die Ansichten wurden nicht initialisiert. Prüfe die Reihenfolge der Skripte oder Modul-Exporte.</div>';
-                }
-            }, 500);
-        });
+        loadNextScript(0);
     </script>
 </body>
 </html>
