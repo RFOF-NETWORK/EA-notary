@@ -7,33 +7,25 @@
     <link rel="stylesheet" href="src/assets/styles.css">
 </head>
 <body>
-    <!-- 🚨 MOBILE-DIAGNOSEMONITOR -->
+    <!-- 🚨 DIAGNOSEMONITOR (Zeigt jetzt auch logische App-Fehler an) -->
     <div id="handy-konsole" style="background: #fff0f0; color: #d90000; padding: 15px; font-family: monospace; font-size: 13px; z-index: 99999; position: relative; border-bottom: 3px solid red; display: none; word-wrap: break-word;">
-        <strong>Centric Global Status (gh-pages):</strong><br>
+        <strong>Centric Start-Analyse:</strong><br>
     </div>
 
     <div id="app">System wird geladen...</div>
 
     <script>
-        // Sichere globale Ladepflege (Deine Krypto-Abhängigkeiten fixfertig für den Browser vorkompiliert)
         const scriptQueue = [
-            // 1. VENDOR (Direkt als global lauffähige Bundles eingebunden - keine Imports mehr nötig!)
             "https://jsdelivr.net",
             "https://jsdelivr.net",
             "https://jsdelivr.net",
-            
-            // 2. CONFIG & CORE (Deine reinen globalen Skripte)
             "src/config.js",
             "src/core/crypto.js",
             "src/core/hd-wallet.js",
             "src/core/session.js",
-            
-            // 3. VIEWS (UI-Ansichten)
             "src/views/login.js",
             "src/views/dashboard.js",
             "src/views/admin-panel.js", 
-            
-            // 4. APP CONTROL (Router)
             "src/app.js"
         ];
 
@@ -46,27 +38,45 @@
 
         function loadNextScript(index) {
             if (index >= scriptQueue.length) {
-                console.log("🚀 System erfolgreich global geladen!");
+                console.log("🚀 Skripte im DOM verankert.");
+                triggerAppStart(); // Starte die manuelle Überprüfung
                 return;
             }
 
             const scriptPath = scriptQueue[index];
             const script = document.createElement('script');
-            
-            // Reines globales JavaScript aktivieren
             script.type = "text/javascript"; 
-            
-            // Cache-Buster schützt vor veralteten Handy-Daten (gilt nur für deine lokalen Dateien)
             script.src = scriptPath.startsWith('http') ? scriptPath : scriptPath + "?v=" + Date.now();
-
             script.onload = () => loadNextScript(index + 1);
-
             script.onerror = () => {
                 consoleDiv.style.display = 'block';
-                consoleDiv.innerHTML += `<div>❌ <strong>Ladefehler (404):</strong> Datei fehlt im globalen gh-pages Spiegel:<br><code>${scriptPath}</code></div><hr style="border:0;border-top:1px solid #ffcccc;">`;
+                consoleDiv.innerHTML += `<div>❌ Ladefehler (404): ${scriptPath}</div>`;
             };
-
             document.body.appendChild(script);
+        }
+
+        // ⚡ DER START-KICK: Wenn app.js nicht von alleine rendert, stupsen wir es hier an
+        function triggerAppStart() {
+            setTimeout(() => {
+                const appDiv = document.getElementById('app');
+                
+                // Falls die Ansicht immer noch blockiert ist
+                if (appDiv.innerHTML === "System wird geladen...") {
+                    consoleDiv.style.display = 'block';
+                    consoleDiv.innerHTML += `<div>⚠️ Skripte geladen, aber das UI rendert nicht automatisch.</div>`;
+                    
+                    // Versuche den Router manuell anzustoßen (je nachdem wie du ihn in app.js benannt hast)
+                    if (typeof window.initApp === 'function') {
+                        consoleDiv.innerHTML += `<div>🔧 Starte 'window.initApp()' manuell...</div>`;
+                        window.initApp();
+                    } else if (window.App && typeof window.App.init === 'function') {
+                        consoleDiv.innerHTML += `<div>🔧 Starte 'window.App.init()' manuell...</div>`;
+                        window.App.init();
+                    } else {
+                        consoleDiv.innerHTML += `<div>💡 Hinweis: Stelle sicher, dass am Ende deiner <code>src/app.js</code> der Startbefehl (z.B. ein EventListener auf DOMContentLoaded oder der direkte Funktionsaufruf) aktiv ist!</div>`;
+                    }
+                }
+            }, 1000); // Wartet 1 Sekunde nach dem Laden
         }
 
         loadNextScript(0);
