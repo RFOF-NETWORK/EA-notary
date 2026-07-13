@@ -1,9 +1,9 @@
 (function(window) {
-    // 1. Definition der globalen Routen-Konfiguration
+    // 1. Definition der globalen Routen-Konfiguration basierend auf realen Views
     const getRoutes = () => ({
         login: window.LoginView,
         dashboard: window.DashboardView,
-        admin: window.AdminPanelView
+        import: window.WalletImportView
     });
 
     let currentRoute = "login";
@@ -28,16 +28,17 @@
 
         // Init NACH dem Rendern
         requestAnimationFrame(() => {
-            view.init(navigateTo);
+            if (typeof view.init === "function") {
+                view.init(navigateTo);
+            }
         });
     };
 
-    // 3. Überprüfung, ob alle globalen Abhängigkeiten geladen sind
+    // 3. Überprüfung, ob alle globalen Mindest-Abhängigkeiten geladen sind
     const checkDependencies = () => {
+        // Kern-Module MÜSSEN vorhanden sein, um den Loop zu passieren
         return (
             window.LoginView &&
-            window.DashboardView &&
-            window.AdminPanelView &&
             window.AuthService &&
             window.SessionManager
         );
@@ -46,12 +47,13 @@
     // 4. Start-Logik mit Sicherheits-Warteschleife
     const startApp = () => {
         if (checkDependencies()) {
-            console.log("App-Start: Alle Systeme bereit.");
+            console.log("App-Start: Kern-Systeme bereit.");
             
-            // Session-Check
+            // Session-Check für automatische Weiterleitung
             const session = window.SessionManager.getSession();
             if (session) {
-                currentRoute = (session.role === "admin") ? "admin" : "dashboard";
+                // Falls eine Session existiert, leite zum Dashboard weiter
+                currentRoute = "dashboard";
             }
             
             navigateTo(currentRoute);
