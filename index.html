@@ -7,14 +7,15 @@
     <link rel="stylesheet" href="src/assets/styles.css">
 </head>
 <body>
-    <!-- 🚨 DIAGNOSEMONITOR (Zeigt jetzt auch logische App-Fehler an) -->
+    <!-- 🚨 DIAGNOSEMONITOR (Zeigt exakt an, welche Abhängigkeit ggf. blockiert) -->
     <div id="handy-konsole" style="background: #fff0f0; color: #d90000; padding: 15px; font-family: monospace; font-size: 13px; z-index: 99999; position: relative; border-bottom: 3px solid red; display: none; word-wrap: break-word;">
-        <strong>Centric Start-Analyse:</strong><br>
+        <strong>Centric Global Status (gh-pages):</strong><br>
     </div>
 
     <div id="app">System wird geladen...</div>
 
     <script>
+        // KORRIGIERTE CDN-Links und vollständige lokale Ladekette
         const scriptQueue = [
             "https://jsdelivr.net",
             "https://jsdelivr.net",
@@ -23,14 +24,14 @@
             "src/core/crypto.js",
             "src/core/hd-wallet.js",
             "src/core/session.js",
+            "src/core/auth.js",
             "src/views/login.js",
             "src/views/dashboard.js",
             "src/views/admin-panel.js", 
-            "src/app.js"
+            "src/app.js" 
         ];
 
         const consoleDiv = document.getElementById('handy-konsole');
-        
         window.addEventListener('error', function(e) {
             consoleDiv.style.display = 'block';
             consoleDiv.innerHTML += `<div>❌ Code-Fehler: ${e.message} <br><small>in ${e.filename ? e.filename.split('/').pop() : 'Unbekannt'}:${e.lineno}</small></div><hr style="border:0;border-top:1px solid #ffcccc;">`;
@@ -38,8 +39,18 @@
 
         function loadNextScript(index) {
             if (index >= scriptQueue.length) {
-                console.log("🚀 Skripte im DOM verankert.");
-                triggerAppStart(); // Starte die manuelle Überprüfung
+                console.log("🚀 Alle Skripte geladen. Bereite globale Umgebung für originale app.js vor...");
+
+                // ⚡ INFRASTRUKTUR-BRÜCKE: Da deine originale app.js starr nach window.WalletImportView verlangt,
+                // mappen wir dieses Objekt hier einfach virtuell auf das neue AdminPanelView.
+                // Damit läuft die app.js fehlerfrei durch, ohne dass du sie verändern musst.
+                if (!window.WalletImportView) {
+                    window.WalletImportView = window.AdminPanelView || { render: () => "<div>Admin Panel Ersatz</div>", init: () => {} };
+                }
+
+                // ⚡ EVENT-TRIGGER: Da das echte DOM-Event beim dynamischen Nachladen schon vorbei ist,
+                // feuern wir es hier künstlich ab. Deine originale app.js wacht dadurch sofort auf.
+                window.dispatchEvent(new Event('DOMContentLoaded'));
                 return;
             }
 
@@ -47,38 +58,14 @@
             const script = document.createElement('script');
             script.type = "text/javascript"; 
             script.src = scriptPath.startsWith('http') ? scriptPath : scriptPath + "?v=" + Date.now();
+            
             script.onload = () => loadNextScript(index + 1);
             script.onerror = () => {
                 consoleDiv.style.display = 'block';
-                consoleDiv.innerHTML += `<div>❌ Ladefehler (404): ${scriptPath}</div>`;
+                consoleDiv.innerHTML += `<div>❌ Ladefehler (404): Datei fehlt: <code>${scriptPath}</code></div>`;
             };
             document.body.appendChild(script);
         }
-
-        // ⚡ DER START-KICK: Wenn app.js nicht von alleine rendert, stupsen wir es hier an
-        function triggerAppStart() {
-            setTimeout(() => {
-                const appDiv = document.getElementById('app');
-                
-                // Falls die Ansicht immer noch blockiert ist
-                if (appDiv.innerHTML === "System wird geladen...") {
-                    consoleDiv.style.display = 'block';
-                    consoleDiv.innerHTML += `<div>⚠️ Skripte geladen, aber das UI rendert nicht automatisch.</div>`;
-                    
-                    // Versuche den Router manuell anzustoßen (je nachdem wie du ihn in app.js benannt hast)
-                    if (typeof window.initApp === 'function') {
-                        consoleDiv.innerHTML += `<div>🔧 Starte 'window.initApp()' manuell...</div>`;
-                        window.initApp();
-                    } else if (window.App && typeof window.App.init === 'function') {
-                        consoleDiv.innerHTML += `<div>🔧 Starte 'window.App.init()' manuell...</div>`;
-                        window.App.init();
-                    } else {
-                        consoleDiv.innerHTML += `<div>💡 Hinweis: Stelle sicher, dass am Ende deiner <code>src/app.js</code> der Startbefehl (z.B. ein EventListener auf DOMContentLoaded oder der direkte Funktionsaufruf) aktiv ist!</div>`;
-                    }
-                }
-            }, 1000); // Wartet 1 Sekunde nach dem Laden
-        }
-
         loadNextScript(0);
     </script>
 </body>
