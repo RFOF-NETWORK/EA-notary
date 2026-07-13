@@ -7,72 +7,9 @@
     <link rel="stylesheet" href="src/assets/styles.css">
 </head>
 <body>
-    <!-- 🚨 DIAGNOSEMONITOR (Zeigt exakt an, welche Abhängigkeit ggf. blockiert) -->
-    <div id="handy-konsole" style="background: #fff0f0; color: #d90000; padding: 15px; font-family: monospace; font-size: 13px; z-index: 99999; position: relative; border-bottom: 3px solid red; display: none; word-wrap: break-word;">
-        <strong>Centric Global Status (gh-pages):</strong><br>
-    </div>
+    <div id="app">System wird initialisiert...</div>
 
-    <div id="app">System wird geladen...</div>
-
-    <script>
-        // KORRIGIERTE CDN-Links und vollständige lokale Ladekette
-        const scriptQueue = [
-            // 1. VENDOR (Global via CDN - diese Libs setzen window.nobleSecp256k1 etc.)
-            "https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.0/sha3.js",
-            "https://cdn.jsdelivr.net/npm/@noble/secp256k1@2.0.0/lib/index.js",
-            "https://cdn.jsdelivr.net/npm/@scure/bip39@1.2.0/dist/index.js",
-            
-            // 2. CONFIG & CORE
-            "src/config.js",
-            "src/core/crypto.js",
-            "src/core/hd-wallet.js",
-            "src/core/session.js",
-            
-            // 3. VIEWS
-            "src/views/login.js",
-            "src/views/dashboard.js",
-            "src/views/admin-panel.js", 
-            
-            // 4. APP CONTROL
-            "src/app.js"
-        ];
-
-        const consoleDiv = document.getElementById('handy-konsole');
-        window.addEventListener('error', function(e) {
-            consoleDiv.style.display = 'block';
-            consoleDiv.innerHTML += `<div>❌ Code-Fehler: ${e.message} <br><small>in ${e.filename ? e.filename.split('/').pop() : 'Unbekannt'}:${e.lineno}</small></div><hr style="border:0;border-top:1px solid #ffcccc;">`;
-        });
-
-        function loadNextScript(index) {
-            if (index >= scriptQueue.length) {
-                console.log("🚀 Alle Skripte geladen. Bereite globale Umgebung für originale app.js vor...");
-
-                // ⚡ INFRASTRUKTUR-BRÜCKE: Da deine originale app.js starr nach window.WalletImportView verlangt,
-                // mappen wir dieses Objekt hier einfach virtuell auf das neue AdminPanelView.
-                // Damit läuft die app.js fehlerfrei durch, ohne dass du sie verändern musst.
-                if (!window.WalletImportView) {
-                    window.WalletImportView = window.AdminPanelView || { render: () => "<div>Admin Panel Ersatz</div>", init: () => {} };
-                }
-
-                // ⚡ EVENT-TRIGGER: Da das echte DOM-Event beim dynamischen Nachladen schon vorbei ist,
-                // feuern wir es hier künstlich ab. Deine originale app.js wacht dadurch sofort auf.
-                window.dispatchEvent(new Event('DOMContentLoaded'));
-                return;
-            }
-
-            const scriptPath = scriptQueue[index];
-            const script = document.createElement('script');
-            script.type = "text/javascript"; 
-            script.src = scriptPath.startsWith('http') ? scriptPath : scriptPath + "?v=" + Date.now();
-            
-            script.onload = () => loadNextScript(index + 1);
-            script.onerror = () => {
-                consoleDiv.style.display = 'block';
-                consoleDiv.innerHTML += `<div>❌ Ladefehler (404): Datei fehlt: <code>${scriptPath}</code></div>`;
-            };
-            document.body.appendChild(script);
-        }
-        loadNextScript(0);
-    </script>
+    <!-- NUR DIESE EINE DATEI WIRD GELADEN, DER REST KOMMT DURCH IMPORTS -->
+    <script type="module" src="src/app.js"></script>
 </body>
 </html>
