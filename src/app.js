@@ -1,8 +1,8 @@
-import { SessionManager } from './core/session.js';
-import { LoginView } from './views/login.js';
-import { DashboardView } from './views/dashboard.js';
-import { AdminPanelView } from './views/admin-panel.js';
-import { SessionManager } from './core/session.js';
+import { SessionManager } from 'src/core/session.js';
+import { LoginView } from 'src/views/login.js';
+import { DashboardView } from 'src/views/dashboard.js';
+import { AdminPanelView } from 'src/views/admin-panel.js';
+import { SessionManager } from 'src/core/session.js';
 
 const routes = {
     login: LoginView,
