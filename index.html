@@ -7,25 +7,38 @@
     <link rel="stylesheet" href="src/assets/styles.css">
 </head>
 <body>
-    <div id="app">
-        <!-- Dein Login-Screen Inhalt -->
-    </div>
+    <div id="app">System wird geladen...</div>
 
-    <!-- 1. FUSIONIERTE VENDOR-LOGIK -->
+    <!-- 1. VENDOR-EBENE: Die Basis-Mathematik -->
     <script src="src/vendor/noble-hashes/sha3.js"></script>
     <script src="src/vendor/noble-secp256k1/index.js"></script>
+    <script src="src/vendor/scure-bip39/index.js"></script>
 
-    <!-- 2. APPLIKATIONS-LOGIK -->
+    <!-- 2. CORE-EBENE: System-Logik & Config -->
+    <script src="src/config.js"></script>
+    <script src="src/core/crypto.js"></script>
+    <script src="src/core/hd-wallet.js"></script>
+    <script src="src/core/session.js"></script>
+    <script src="src/core/auth.js"></script>
+
+    <!-- 3. VIEW-EBENE: UI-Komponenten -->
+    <script src="src/views/login.js"></script>
+    <script src="src/views/dashboard.js"></script>
+    <script src="src/views/admin-panel.js"></script>
+
+    <!-- 4. APP-EBENE: Controller & Router -->
     <script src="src/app.js"></script>
 
-    <!-- 3. SYSTEM-DIAGNOSE (Verifiziert die Fusion im Browser-RAM) -->
+    <!-- 5. SYSTEM-DIAGNOSE -->
     <script>
-        console.log("TEST: Vendor geladen?", !!window.CryptoBridge);
-        if (!window.CryptoBridge) {
-            console.error("KRITISCH: CryptoBridge nicht gefunden!");
-        } else {
-            console.log("System-Check: ERFOLG");
-        }
+        window.addEventListener("DOMContentLoaded", () => {
+            console.log("System-Check: Prüfe Initialisierung...");
+            if (typeof window.CryptoEngine !== 'undefined' && typeof window.AuthService !== 'undefined') {
+                console.log("System-Check: ERFOLG - Alle Core-Services geladen.");
+            } else {
+                console.error("KRITISCH: Core-Services konnten nicht geladen werden!");
+            }
+        });
     </script>
 </body>
 </html>
