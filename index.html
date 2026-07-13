@@ -11,11 +11,21 @@
         <!-- Dein Login-Screen Inhalt -->
     </div>
 
-    <!-- 1. FUSIONIERTE VENDOR-LOGIK (Wird geladen, bevor app.js überhaupt existiert) -->
+    <!-- 1. FUSIONIERTE VENDOR-LOGIK -->
     <script src="src/vendor/noble-hashes/sha3.js"></script>
     <script src="src/vendor/noble-secp256k1/index.js"></script>
 
-    <!-- 2. APPLIKATIONS-LOGIK (Greift direkt auf window.CryptoBridge zu) -->
+    <!-- 2. APPLIKATIONS-LOGIK -->
     <script src="src/app.js"></script>
+
+    <!-- 3. SYSTEM-DIAGNOSE (Verifiziert die Fusion im Browser-RAM) -->
+    <script>
+        console.log("TEST: Vendor geladen?", !!window.CryptoBridge);
+        if (!window.CryptoBridge) {
+            console.error("KRITISCH: CryptoBridge nicht gefunden!");
+        } else {
+            console.log("System-Check: ERFOLG");
+        }
+    </script>
 </body>
 </html>
