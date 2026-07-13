@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="src/assets/styles.css">
 </head>
 <body>
-    <div id="app">System wird initialisiert...</div>
+    <div id="app">
+        <!-- Dein Login-Screen Inhalt -->
+    </div>
 
-    <script type="module" src="src/app.js"></script>
+    <!-- 1. FUSIONIERTE VENDOR-LOGIK (Wird geladen, bevor app.js überhaupt existiert) -->
+    <script src="src/vendor/noble-hashes/sha3.js"></script>
+    <script src="src/vendor/noble-secp256k1/index.js"></script>
+
+    <!-- 2. APPLIKATIONS-LOGIK (Greift direkt auf window.CryptoBridge zu) -->
+    <script src="src/app.js"></script>
 </body>
 </html>
