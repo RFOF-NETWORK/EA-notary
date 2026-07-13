@@ -24,7 +24,7 @@ EA-notary/
 │   ├── views/                      # UI-Komponenten (Reines JS oder Web Components)
 │   │   ├── login.js                # Login- & Registrierungsmaske
 │   │   ├── dashboard.js            # Zeigt Benutzername & Hot-Wallet an
-│   │   └── wallet-import.js        # Optionale Maske für existierende BIP39 Phrasen
+│   │   └── admin-panel.js        
 │   ├── app.js                      # Router & App-Initialisierung
 │   └── config.js                   # Globale Konfiguration (z.B. System-Wallet Public Key)
 ├── index.html                      # Haupteinstiegspunkt für GitHub Pages
