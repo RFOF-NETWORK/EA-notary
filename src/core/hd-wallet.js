@@ -5,8 +5,8 @@
 
 import { wordlist, generateMnemonic, validateMnemonic as bip39Validate, mnemonicToSeedSync } from '../vendor/scure-bip39/index.js';
 import { HDKey } from 'src/scure-bip32/index.js';
-import { getPublicKey } from '../vendor/noble-secp256k1/index.js';
-import { keccak_256 } from '../vendor/noble-hashes/sha3.js';
+import { getPublicKey } from 'src/vendor/noble-secp256k1/index.js';
+import { keccak_256 } from 'src/vendor/noble-hashes/sha3.js';
 import { SYSTEM_CONFIG } from 'src/config.js';
 
 export class HDWalletEngine {
