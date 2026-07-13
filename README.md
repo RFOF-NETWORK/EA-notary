@@ -11,6 +11,7 @@ EA-notary/
 │   ├── assets/
 │   │   └── styles.css              # Globales Styling
 │   ├── core/                       # Das Herzstück: Kryptografie & Logik
+│   │   ├── auth.js
 │   │   ├── crypto.js               # Hashing (SHA-256/Argon2), AES-GCM Ver-/Entschlüsselung
 │   │   ├── hd-wallet.js            # BIP39/BIP32 Logik (Hot/Cold Derivierung)
 │   │   └── session.js              # Persistenz-Verwaltung (SessionStorage / LocalStorage)
