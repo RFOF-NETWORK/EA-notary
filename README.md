@@ -15,6 +15,10 @@ EA-notary/
 │   │   ├── hd-wallet.js            # BIP39/BIP32 Logik (Hot/Cold Derivierung)
 │   │   └── session.js              # Persistenz-Verwaltung (SessionStorage / LocalStorage)
 │   ├── vendor/                     # Externe Abhängigkeiten (BIP39 Wordlists)
+│   │   ├── noble-hashes/
+│   │   └── sha3.js
+│   │   ├── noble-secp256k1/
+│   │   └── index.js
 │   │   └── scure-bip39/
 │   │       └── english.js          # Lokale Kopie der BIP39 English Wordlist
 │   ├── views/                      # UI-Komponenten (Reines JS oder Web Components)
