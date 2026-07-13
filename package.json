@@ -1,10 +1,11 @@
 {
-  "name": "ea-notary-wallet",
+  "name": "ea-notary",
   "version": "1.0.0",
-  "type": "module",
-  "description": "Repository-Centric Serverless Crypto Wallet",
+  "description": "Repository-Centric Serverless Crypto Wallet - Zero-Import Notary System",
+  "author": "RFOF-NETWORK",
+  "license": "EA",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "echo \"System läuft im flachen Global-Namespace-Modus\""
   },
   "dependencies": {}
 }
