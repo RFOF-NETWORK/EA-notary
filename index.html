@@ -7,37 +7,53 @@
     <link rel="stylesheet" href="src/assets/styles.css">
 </head>
 <body>
+    <!-- 🚨 HANDY-FEHLERMONITOR (Zeigt JS-Fehler sofort oben auf dem Smartphone an) -->
+    <div id="handy-konsole" style="background: #fff0f0; color: #d90000; padding: 15px; font-family: monospace; font-size: 13px; z-index: 99999; position: relative; border-bottom: 3px solid red; display: none; word-wrap: break-word;">
+        <strong>JavaScript Fehler erkannt:</strong><br>
+    </div>
+    <script>
+        window.addEventListener('error', function(e) {
+            const consoleDiv = document.getElementById('handy-konsole');
+            consoleDiv.style.display = 'block';
+            consoleDiv.innerHTML += '<div>❌ ' + e.message + ' <br><small>in ' + (e.filename ? e.filename.split('/').pop() : 'Unbekannt') + ':' + e.lineno + '</small></div><hr style="border:0;border-top:1px solid #ffcccc;">';
+        });
+    </script>
+
     <div id="app">System wird geladen...</div>
 
-    <!-- 1. VENDOR-EBENE: Die Basis-Mathematik -->
-    <script src="src/vendor/noble-hashes/sha3.js"></script>
-    <script src="src/vendor/noble-secp256k1/index.js"></script>
-    <script src="src/vendor/scure-bip39/english.js"></script>
+    <!-- 1. VENDOR-EBENE (Als Module geladen, da noble-Bibliotheken ES-Exporte nutzen) -->
+    <script type="module" src="src/vendor/noble-hashes/sha3.js"></script>
+    <script type="module" src="src/vendor/noble-secp256k1/index.js"></script>
+    <script type="module" src="src/vendor/scure-bip39/english.js"></script>
 
     <!-- 2. CORE-EBENE: System-Logik & Config -->
-    <script src="src/config.js"></script>
-    <script src="src/core/crypto.js"></script>
-    <script src="src/core/hd-wallet.js"></script>
-    <script src="src/core/session.js"></script>
-    <script src="src/core/auth.js"></script>
+    <script type="module" src="src/config.js"></script>
+    <script type="module" src="src/core/crypto.js"></script>
+    <script type="module" src="src/core/hd-wallet.js"></script>
+    <script type="module" src="src/core/session.js"></script>
+    <script type="module" src="src/core/auth.js"></script>
 
     <!-- 3. VIEW-EBENE: UI-Komponenten -->
-    <script src="src/views/login.js"></script>
-    <script src="src/views/dashboard.js"></script>
-    <script src="src/views/wallet-import.js"></script>
+    <script type="module" src="src/views/login.js"></script>
+    <script type="module" src="src/views/dashboard.js"></script>
+    <script type="module" src="src/views/wallet-import.js"></script>
 
     <!-- 4. APP-EBENE: Controller & Router -->
-    <script src="src/app.js"></script>
+    <script type="module" src="src/app.js"></script>
 
     <!-- 5. SYSTEM-DIAGNOSE -->
-    <script>
+    <script type="module">
         window.addEventListener("DOMContentLoaded", () => {
             console.log("System-Check: Prüfe Initialisierung...");
-            if (typeof window.CryptoEngine !== 'undefined' && typeof window.AuthService !== 'undefined') {
-                console.log("System-Check: ERFOLG - Alle Core-Services geladen.");
-            } else {
-                console.error("KRITISCH: Core-Services konnten nicht geladen werden!");
-            }
+            setTimeout(() => {
+                if (window.CryptoEngine || window.AuthService || document.getElementById('app').innerHTML !== 'System wird geladen...') {
+                    console.log("System-Check: ERFOLG");
+                } else {
+                    const consoleDiv = document.getElementById('handy-konsole');
+                    consoleDiv.style.display = 'block';
+                    consoleDiv.innerHTML += '<div>⚠️ Warnung: Die Ansichten wurden nicht initialisiert. Prüfe die Reihenfolge der Skripte oder Modul-Exporte.</div>';
+                }
+            }, 500);
         });
     </script>
 </body>
