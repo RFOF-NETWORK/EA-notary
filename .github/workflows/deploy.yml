@@ -16,22 +16,22 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v4
 
-      - name: Build & Debug Structure
+      - name: Build & Deploy
         run: |
-          # 1. Bereinigen
+          # 1. Bereinigen und Vorbereiten
           rm -rf dist
           mkdir -p dist
           
-          # 2. Kopieren
+          # 2. Kopieren aller notwendigen Ressourcen
           cp -r src/ dist/src/
           cp -r public/ dist/public/
           cp index.html dist/index.html
           
-          # 3. DEBUG: Zeige uns die Struktur im Log, damit wir sehen, was passiert
-          echo "--- Verzeichnisstruktur in dist: ---"
-          ls -R dist
-          echo "------------------------------------"
-
+          # 3. Validierung der Struktur
+          echo "Prüfung der Struktur:"
+          ls -F dist/
+          ls -F dist/src/
+          
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
