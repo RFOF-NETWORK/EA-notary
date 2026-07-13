@@ -1,19 +1,16 @@
-import { SessionManager } from 'src/core/session.js';
-import { LoginView } from 'src/views/login.js';
-import { DashboardView } from 'src/views/dashboard.js';
-import { AdminPanelView } from 'src/views/admin-panel.js';
-import { SessionManager } from 'src/core/session.js';
+// KEINE IMPORTS MEHR! Alles ist jetzt global via window verfügbar.
 
 const routes = {
-    login: LoginView,
-    dashboard: DashboardView,
-    admin: AdminPanelView
+    login: window.LoginView, // Diese Views müssen jetzt auch global im window liegen
+    dashboard: window.DashboardView,
+    admin: window.AdminPanelView
 };
 
 let currentRoute = "login";
 
 function router() {
-    const session = SessionManager.getSession();
+    // Greife direkt auf den SessionManager zu, der jetzt global existiert
+    const session = window.SessionManager ? window.SessionManager.getSession() : null;
 
     // Automatische Rollen-Erkennung
     if (session) {
@@ -23,9 +20,8 @@ function router() {
     const view = routes[currentRoute];
     const appContainer = document.getElementById("app");
 
-    // Finale Sicherheits-Checks (erweitert zur Diagnose)
     if (!appContainer) {
-        document.body.innerHTML = "FEHLER: #app Container wurde nicht gefunden!";
+        console.error("FEHLER: #app Container wurde nicht gefunden!");
         return;
     }
     if (!view) {
@@ -48,5 +44,7 @@ function navigateTo(route) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
+    // Hier kannst du jetzt direkt deine neuen globalen Systeme testen
+    console.log("System Initialisiert. CryptoBridge bereit:", !!window.CryptoBridge);
     router();
 });
